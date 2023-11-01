@@ -1,0 +1,27 @@
+From 476152742021303d2defeb69f524bcc302618081 Mon Sep 17 00:00:00 2001
+From: Leah Leshchinsky <lleshchi@redhat.com>
+Date: Mon, 29 Aug 2022 14:07:39 -0400
+Subject: [PATCH] Start stalld service as initrc_t
+
+Stalld currently runs as an unconfined_service_t.
+
+Edit to service file so that the daemon is launched as an initrc_t.
+
+Signed-off-by: Leah Leshchinsky <lleshchi@redhat.com>
+
+diff --git a/redhat/stalld.service b/redhat/stalld.service
+index e0eb4b77b0a7..bcd4b767f629 100644
+--- a/redhat/stalld.service
++++ b/redhat/stalld.service
+@@ -9,7 +9,7 @@ ExecStartPre=/usr/bin/throttlectl off
+ 
+ # In case the regex passed to IT or IP includes C escape sequences,
+ # use ${IT} or ${IP} instead of $IT or $IP
+-ExecStart=/usr/bin/stalld --systemd $CLIST $AGGR $BP $BR $BD $THRESH $LOGGING $FG $PF $IT $IP
++ExecStart=/bin/sh -c "/usr/bin/stalld --systemd $CLIST $AGGR $BP $BR $BD $THRESH $LOGGING $FG $PF $IT $IP"
+ ExecStopPost=/usr/bin/throttlectl on
+ CPUSchedulingPolicy=fifo
+ CPUSchedulingPriority=10
+-- 
+2.31.1
+
