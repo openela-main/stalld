@@ -1,6 +1,6 @@
 Name:		stalld
-Version:	1.17.1
-Release:	1%{?dist}
+Version:	1.19.1
+Release:	2%{?dist}
 Summary:	Daemon that finds starving tasks and gives them a temporary boost
 
 License:	GPLv2
@@ -14,6 +14,17 @@ BuildRequires:	systemd-rpm-macros
 
 Requires:	systemd
 
+%ifnarch i686
+BuildRequires:	bpftool
+BuildRequires:	clang
+BuildRequires:	libbpf-devel
+
+Requires:	libbpf
+%endif
+
+# Patches
+Patch1: Make-fill_process_comm-open-comm-file-as-READ_ONLY.patch
+
 %description
 The stalld program monitors the set of system threads,
 looking for threads that are ready-to-run but have not
@@ -23,14 +34,14 @@ boost using the SCHED_DEADLINE policy. The default is to
 allow 10 microseconds of runtime for 1 second of clock time.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %make_build CFLAGS="%{optflags} %{build_cflags} -DVERSION="\\\"%{version}\\\"""  LDFLAGS="%{build_ldflags}"
 
 %install
 %make_install DOCDIR=%{_docdir} MANDIR=%{_mandir} BINDIR=%{_bindir} DATADIR=%{_datadir} VERSION=%{version}
-%make_install -C redhat UNITDIR=%{_unitdir}
+%make_install -C systemd UNITDIR=%{_unitdir}
 
 %files
 %{_bindir}/%{name}
@@ -51,11 +62,19 @@ allow 10 microseconds of runtime for 1 second of clock time.
 %systemd_postun_with_restart %{name}.service
 
 %changelog
-* Fri Oct 21 2022 Leah Leshchinsky <lleshchi@redhat.com> - 1.17.1-1
+* Wed Feb 21 2024 John Kacur <jkacur@redhat.com> - 1.19.1-2
+-  Make fill_process_comm() open comm file as READ_ONLY
+Resolves: RHEL-25846
+
+* Fri Feb 09 2024 John Kacur <jkacur@redhat.com> - 1.19.1-1
+- Rebase to upstream stalld-1.19.1
+Resolves: RHEL-7865
+
+* Tue Oct 18 2022 Leah Leshchinsky <lleshchi@redhat.com> - 1.17.1-1
 - stalld: Fix memory leak in print_boosted_info()
 - utils: Check if the system is in lockdown mode
 - stalld: print process comm and cpu when boosting
-Resolves: rhbz#2136572
+Resolves: rhbz#2120799
 
 * Thu Jul 14 2022 John Kacur <jkacur@redhat.com> - 1.17-1
 - rebase to upstream v1.17
