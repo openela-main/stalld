@@ -1,6 +1,6 @@
 Name:		stalld
-Version:	1.17.1
-Release:	1%{?dist}
+Version:	1.19.1
+Release:	4%{?dist}
 Summary:	Daemon that finds starving tasks and gives them a temporary boost
 
 License:	GPLv2
@@ -14,7 +14,16 @@ BuildRequires:	systemd-rpm-macros
 
 Requires:	systemd
 
-Patch0:         Start-stalld-service-as-initrc_t.patch
+%ifnarch i686
+BuildRequires:	bpftool
+BuildRequires:	clang
+BuildRequires:	libbpf-devel
+BuildRequires:  llvm
+
+Requires:	libbpf
+%endif
+
+Patch0:	Start-stalld-service-as-initrc_t.patch
 
 %description
 The stalld program monitors the set of system threads,
@@ -32,7 +41,7 @@ allow 10 microseconds of runtime for 1 second of clock time.
 
 %install
 %make_install DOCDIR=%{_docdir} MANDIR=%{_mandir} BINDIR=%{_bindir} DATADIR=%{_datadir} VERSION=%{version}
-%make_install -C redhat UNITDIR=%{_unitdir}
+%make_install -C systemd UNITDIR=%{_unitdir}
 
 %files
 %{_bindir}/%{name}
@@ -53,15 +62,31 @@ allow 10 microseconds of runtime for 1 second of clock time.
 %systemd_postun_with_restart %{name}.service
 
 %changelog
-* Fri Oct 21 2022 Leah Leshchinsky <lleshchi@redhat.com> - 1.17.1-1
+* Wed Feb 14 2024 John Kacur <jkacur@redhat.com> - 1.19.1-4
+- Put back patch to run stalld service as initrc_t
+Resolves: RHEL-8982
+
+* Mon Feb 12 2024 John Kacur <jkacur@redhat.com> - 1.19.1-3
+- Copying over missing tests directory
+Resolves: RHEL-8982
+
+* Mon Feb 12 2024 John Kacur <jkacur@redhat.com> - 1.19.1-2
+- Add llvm as a build requirement
+Resolves: RHEL-8982
+
+* Fri Feb 09 2024 John Kacur <jkacur@redhat.com> - 1.19.1-1
+- Rebase to v1.19.1 upstream
+Resolves: RHEL-8982
+
+* Tue Oct 18 2022 Leah Leshchinsky <lleshchi@redhat.com> - 1.17.1-1
 - stalld: Fix memory leak in print_boosted_info()
 - utils: Check if the system is in lockdown mode
 - stalld: print process comm and cpu when boosting
-Resolves: rhbz#2136559
+Resolves: rhbz#2120800
 
-* Tue Sep 13 2022 Leah Leshchinsky <lleshchi@redhat.com> - 1.17-2
+* Thu Sep 08 2022 Leah Leshchinsky <lleshchi@redhat.com> - 1.17-2
 - Start stalld service as initrc_t
-Resolves:rhbz#2126494
+Resolves:rhbz#2112366
 
 * Thu Jul 14 2022 John Kacur <jkacur@redhat.com> - 1.17-1
 - rebase to upstream v1.17
