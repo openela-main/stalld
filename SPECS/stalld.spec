@@ -1,6 +1,6 @@
 Name:		stalld
-Version:	1.19.1
-Release:	2%{?dist}
+Version:	1.19.6
+Release:	1%{?dist}
 Summary:	Daemon that finds starving tasks and gives them a temporary boost
 
 License:	GPLv2
@@ -22,8 +22,7 @@ BuildRequires:	libbpf-devel
 Requires:	libbpf
 %endif
 
-# Patches
-Patch1: Make-fill_process_comm-open-comm-file-as-READ_ONLY.patch
+%define _hardened_build 1
 
 %description
 The stalld program monitors the set of system threads,
@@ -37,7 +36,7 @@ allow 10 microseconds of runtime for 1 second of clock time.
 %autosetup -p1
 
 %build
-%make_build CFLAGS="%{optflags} %{build_cflags} -DVERSION="\\\"%{version}\\\"""  LDFLAGS="%{build_ldflags}"
+%make_build RPMCFLAGS="%{optflags} %{build_cflags} -DVERSION="\\\"%{version}\\\"""  RPMLDFLAGS="%{build_ldflags}"
 
 %install
 %make_install DOCDIR=%{_docdir} MANDIR=%{_mandir} BINDIR=%{_bindir} DATADIR=%{_datadir} VERSION=%{version}
@@ -62,6 +61,23 @@ allow 10 microseconds of runtime for 1 second of clock time.
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Thu Aug 22 2024 Chris White <chwhite@redhat.com> - 1.19.6-1
+- Makefile: add uninstall target
+- systemd: add BE environment variable to select backend
+Resolves: RHEL-33662
+
+* Wed Jul 31 2024 Chris White <chwhite@redhat.com> - 1.19.5-2
+- Fix changelog to use RPMCFLAGS, allowing for bpf to be used
+Resolves: RHEL-33662
+
+* Thu Jul 18 2024 Chris White <chwhite@redhat.com> - 1.19.5-1
+- Updated compile options for annocheck hardening
+- Ensure we resolve library symbols at load time (-z now) and are a Position Independent Executable (-pie). Refactored compile options to better deal with arch differences.
+- Added an 'annocheck' makefile target for local checking.
+- Makefile: change build to use FORTIFY_SOURCE=3
+- src/utils.c: fix off-by-one error in buffer allocation
+Resolves: RHEL-33662
+
 * Wed Feb 21 2024 John Kacur <jkacur@redhat.com> - 1.19.1-2
 -  Make fill_process_comm() open comm file as READ_ONLY
 Resolves: RHEL-25846
