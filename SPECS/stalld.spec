@@ -1,6 +1,6 @@
 Name:		stalld
-Version:	1.19.6
-Release:	1%{?dist}
+Version:	1.19.8
+Release:	2%{?dist}
 Summary:	Daemon that finds starving tasks and gives them a temporary boost
 
 License:	GPLv2
@@ -21,6 +21,9 @@ BuildRequires:	libbpf-devel
 
 Requires:	libbpf
 %endif
+
+# Patches
+Patch1: stalld-sched_attr-Do-not-define-for-glibc-2.41.patch
 
 %define _hardened_build 1
 
@@ -61,6 +64,11 @@ allow 10 microseconds of runtime for 1 second of clock time.
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Wed May 28 2025 John Kacur <jkacur@redhat.com> - 1.19.8-2
+- Rebase to stalld-1.19.8
+- Check if sched_attr is in glibc
+Resolves: RHEL-94032
+
 * Thu Aug 22 2024 Chris White <chwhite@redhat.com> - 1.19.6-1
 - Makefile: add uninstall target
 - systemd: add BE environment variable to select backend

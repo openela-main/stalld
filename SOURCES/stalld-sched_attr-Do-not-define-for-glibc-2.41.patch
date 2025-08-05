@@ -1,0 +1,33 @@
+From b79c1777ee16901b3d27cd25e50435f4f060cfa8 Mon Sep 17 00:00:00 2001
+From: John Kacur <jkacur@redhat.com>
+Date: Thu, 22 May 2025 11:33:07 -0400
+Subject: [PATCH] stalld: sched_attr: Do not define for glibc >= 2.41
+
+glibc >=2.41 has definitions for struct sched_attr and
+sched_setattr and sched_getattr
+
+Sometimes this is backported by distributions so define conditionally on
+SCHED_ATTR_SIZE_VER0
+
+Signed-off-by: John Kacur <jkacur@redhat.com>
+---
+ src/stalld.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/stalld.h b/src/stalld.h
+index 0c4dcee503ca..7b4d7e60f5f7 100644
+--- a/src/stalld.h
++++ b/src/stalld.h
+@@ -110,7 +110,8 @@ struct stalld_backend {
+ 	void (*destroy)(void);
+ };
+ 
+-#if ! __GLIBC_PREREQ(2, 41) && !defined(GLIBC_HAS_SCHED_ATTR)
++/* sched_attr is not defined in glibc < 2.41, unless backported */
++#ifndef SCHED_ATTR_SIZE_VER0
+ 
+ #ifdef __x86_64__
+ # define __NR_sched_setattr 314
+-- 
+2.49.0
+
