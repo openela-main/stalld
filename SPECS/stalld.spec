@@ -1,16 +1,17 @@
 Name:		stalld
-Version:	1.19.8
-Release:	2%{?dist}
+Version:	1.20.4
+Release:	1%{?dist}
 Summary:	Daemon that finds starving tasks and gives them a temporary boost
 
 License:	GPLv2
-URL:		https://gitlab.com/rt-linux-tools/%{name}/%{name}.git
-Source0:	https://gitlab.com/rt-linux-tools/%{name}/-/archive/v%{version}/%{name}-%{version}.tar.bz2
+URL:		https://git.kernel.org/pub/scm/utils/%{name}/%{name}.git
+Source0:	https://git.kernel.org/pub/scm/utils/%{name}/%{name}.git/snapshot/%{name}-%{version}.tar.gz
 
 BuildRequires:	glibc-devel
 BuildRequires:	gcc
 BuildRequires:	make
 BuildRequires:	systemd-rpm-macros
+BuildRequires:  llvm
 
 Requires:	systemd
 
@@ -23,7 +24,6 @@ Requires:	libbpf
 %endif
 
 # Patches
-Patch1: stalld-sched_attr-Do-not-define-for-glibc-2.41.patch
 
 %define _hardened_build 1
 
@@ -64,6 +64,10 @@ allow 10 microseconds of runtime for 1 second of clock time.
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Wed Aug 20 2025 Wander Lairson Costa <wander@redhat.com> - 1.20.4-1
+- Create rhel-9.6.z build
+Resolves: RHEL-109534
+
 * Wed May 28 2025 John Kacur <jkacur@redhat.com> - 1.19.8-2
 - Rebase to stalld-1.19.8
 - Check if sched_attr is in glibc
