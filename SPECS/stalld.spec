@@ -1,16 +1,17 @@
 Name:		stalld
-Version:	1.19.8
-Release:	2%{?dist}
+Version:	1.20.4
+Release:	1%{?dist}
 Summary:	Daemon that finds starving tasks and gives them a temporary boost
 
 License:	GPL-2.0-or-later AND GPL-2.0-only
-URL:		https://gitlab.com/rt-linux-tools/%{name}/%{name}.git
-Source0:	https://gitlab.com/rt-linux-tools/%{name}/-/archive/v%{version}/%{name}-%{version}.tar.bz2
+URL:           https://git.kernel.org/pub/scm/utils/%{name}/%{name}.git
+Source0:       https://git.kernel.org/pub/scm/utils/%{name}/%{name}.git/snapshot/%{name}-%{version}.tar.gz
 
 BuildRequires:	glibc-devel
 BuildRequires:	gcc
 BuildRequires:	make
 BuildRequires:	systemd-rpm-macros
+BuildRequires:  llvm
 
 Requires:	systemd
 
@@ -23,7 +24,6 @@ Requires:	libbpf
 %endif
 
 # Patches
-Patch1: stalld-sched_attr-Do-not-define-for-glibc-2.41.patch
 
 %define _hardened_build 1
 
@@ -64,10 +64,39 @@ allow 10 microseconds of runtime for 1 second of clock time.
 %systemd_postun_with_restart %{name}.service
 
 %changelog
-* Wed May 28 2025 John Kacur <jkacur@redhat.com> - 1.19.8-2
-- Rebase to stalld-1.19.8
+* Tue Aug 19 2025 Wander Lairson Costa <wander@redhat.com> - 1.20.4-1
+- Rebase to stalld-1.20.4
+- Remove duplicated ExecStart entry from the stalld.service file
+Resolves: RHEL-109112
+
+* Wed Aug 13 2025 Wander Lairson Costa <wander@redhat.com> - 1.20.3-1
+- Rebase to stalld-1.20.3
+- Make systemd start stalld with the SCHED_FIFO:10 priority
+Resolves: RHEL-109112
+
+* Thu Jul 17 2025 Wander Lairson Costa <wander@redhat.com> - 1.20.2
+- Detect the dl_server and enter in log mode
+Resolves: RHEL-73883 RHEL-104107 RHEL-104386
+
+* Thu May 22 2025 John Kacur <jkacur@redhat.com> - 1.19.8-2
 - Check if sched_attr is in glibc
-Resolves: RHEL-94047
+Resolves: RHEL-92953
+
+* Wed Feb 12 2025 Clark Williams <williams@redhat.com> - 1.19.8-1
+- sched_debug: fix non x86 support
+- stalld.h:  fix prototype mis-patch with cleanup_regex()
+- throttlectl.sh:  add errexit
+- stalld.h:  fix incorrect default umask value
+- version bump
+- Fix building with glibc 2.41
+- throttlectl: clean up throttling script due to reported CVE-2024-54159
+- Makefile:  change modes on throttled and stalld
+- stalld.c: use a more reasonable size for reading /proc/stat
+Resolves: RHEL-69567
+Resolves: RHEL-40146
+Resolves: RHEL-79159
+Resolves: RHEL-67223
+Resolves: RHEL-50356
 
 * Tue Oct 29 2024 Troy Dawson <tdawson@redhat.com> - 1.19.6-2
 - Bump release for October 2024 mass rebuild:
