@@ -1,5 +1,5 @@
 Name:		stalld
-Version:	1.20.4
+Version:	1.26.3
 Release:	1%{?dist}
 Summary:	Daemon that finds starving tasks and gives them a temporary boost
 
@@ -11,7 +11,7 @@ BuildRequires:	glibc-devel
 BuildRequires:	gcc
 BuildRequires:	make
 BuildRequires:	systemd-rpm-macros
-BuildRequires:  llvm
+BuildRequires:  llvm-devel
 
 Requires:	systemd
 
@@ -64,14 +64,35 @@ allow 10 microseconds of runtime for 1 second of clock time.
 %systemd_postun_with_restart %{name}.service
 
 %changelog
-* Wed Aug 20 2025 Wander Lairson Costa <wander@redhat.com> - 1.20.4-1
-- Create rhel-9.6.z build
-Resolves: RHEL-109534
+* Sat Jan 10 2026 Wander Lairson Costa <wander@redhat.com> - 1.26.3-1
+- Rebase to stalld-1.26.3
+- Build System Improvements and added riscv64 arch
+- Remove LTO build flags
+- Make queue_track the default backend
+- Remove the -m64 build option
+Resolves: RHEL-111528 RHEL-111526 RHEL-96207 RHEL-96205 RHEL-111803
 
-* Wed May 28 2025 John Kacur <jkacur@redhat.com> - 1.19.8-2
-- Rebase to stalld-1.19.8
+* Tue Aug 19 2025 Wander Lairson Costa <wander@redhat.com> - 1.20.4-1
+- Rebase to stalld-1.20.4
+- Remove duplicated ExecStart entry from the stalld.service file
+Resolves: RHEL-108827
+
+* Wed Aug 13 2025 Wander Lairson Costa <wander@redhat.com> - 1.20.3-1
+- Rebase to stalld-1.20.3
+- Make systemd start stalld with the SCHED_FIFO:10 priority
+Resolves: RHEL-109088
+
+* Thu Jul 16 2025 Wander Lairson Costa <wander@redhat.com> - 1.20.2
+- Rebase to stalld-1.20.2
+Resolves: RHEL-96213 RHEL-96227 RHEL-104106
+
+* Thu May 22 2025 John Kacur <jkacur@redhat.com> - 1.19.8-2
 - Check if sched_attr is in glibc
-Resolves: RHEL-94032
+Resolves: RHEL-92952
+
+* Wed May 21 2025 John Kacur <jkacur@redhat.com> - 1.19.8-1
+- Rebase to stalld-1.19.8
+Resolves: RHEL-92952
 
 * Thu Aug 22 2024 Chris White <chwhite@redhat.com> - 1.19.6-1
 - Makefile: add uninstall target
