@@ -1,5 +1,5 @@
 Name:		stalld
-Version:	1.20.4
+Version:	1.26.3
 Release:	1%{?dist}
 Summary:	Daemon that finds starving tasks and gives them a temporary boost
 
@@ -11,16 +11,16 @@ BuildRequires:	glibc-devel
 BuildRequires:	gcc
 BuildRequires:	make
 BuildRequires:	systemd-rpm-macros
-BuildRequires:  llvm
+BuildRequires:  llvm-devel
 
 Requires:	systemd
 
 %ifnarch i686
-BuildRequires:	bpftool
+BuildRequires:	bpftool >= 7.6
 BuildRequires:	clang
-BuildRequires:	libbpf-devel
+BuildRequires:	libbpf-devel >= 1.60
 
-Requires:	libbpf
+Requires:       libbpf >= 1.60
 %endif
 
 # Patches
@@ -64,6 +64,14 @@ allow 10 microseconds of runtime for 1 second of clock time.
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Sat Jan 10 2026 Wander Lairson Costa <wander@redhat.com> - 1.26.3-1
+- Rebase to stalld-1.26.3
+- Build System Improvements and added riscv64 arch
+- Make queue_track the default backend
+- Remove LTO build flags
+- Remove the -m64 build flag
+Resolves: RHEL-105604 RHEL-114506
+
 * Tue Aug 19 2025 Wander Lairson Costa <wander@redhat.com> - 1.20.4-1
 - Rebase to stalld-1.20.4
 - Remove duplicated ExecStart entry from the stalld.service file
